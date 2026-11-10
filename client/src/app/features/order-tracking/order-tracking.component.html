@@ -1,0 +1,59 @@
+<div class="order-tracking-container">
+  <header class="tracking-header">
+    <h1>Seguimiento de Órdenes</h1>
+    <p class="subtitle">Eventos en tiempo real de tus órdenes</p>
+  </header>
+
+  <div class="controls-section">
+    <button 
+      mat-raised-button 
+      [color]="isConnected ? 'warn' : 'primary'"
+      (click)="toggleConnection()"
+      [disabled]="isLoading"
+      class="connection-toggle">
+      <mat-icon>{{ isConnected ? 'stop' : 'play_arrow' }}</mat-icon>
+      {{ isConnected ? 'Detener Conexión' : 'Iniciar Conexión' }}
+    </button>
+
+    <mat-chip-set aria-label="Estado de conexión">
+      <mat-chip [class.connected]="isConnected" [class.disconnected]="!isConnected">
+        <mat-icon>{{ isConnected ? 'wifi' : 'wifi_off' }}</mat-icon>
+        {{ isConnected ? 'Conectado' : 'Desconectado' }}
+      </mat-chip>
+    </mat-chip-set>
+  </div>
+
+  <div class="events-section" *ngIf="events.length > 0; else emptyState">
+    <div class="events-header">
+      <h2>Eventos Recibidos</h2>
+      <span class="event-count">{{ events.length }} evento(s)</span>
+    </div>
+
+    <div class="events-list" role="log" aria-live="polite">
+      <app-order-event-card
+        *ngFor="let event of events; trackBy: trackByEventId"
+        [event]="event"
+        class="event-item">
+      </app-order-event-card>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state" *ngIf="!isConnected && !isLoading">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <h3>No hay eventos</h3>
+      <p>Inicia la conexión para comenzar a recibir eventos de órdenes en tiempo real</p>
+    </div>
+  </ng-template>
+
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Estableciendo conexión con el servidor...</p>
+  </div>
+
+  <mat-error *ngIf="connectionError" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ connectionError }}</span>
+    <button mat-button (click)="toggleConnection()">Reintentar</button>
+  </mat-error>
+</div>

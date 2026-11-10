@@ -1,0 +1,77 @@
+<div class="event-card" [class]="'event-card--' + (eventType$ | async)">
+  <div class="event-card__header">
+    <div class="event-card__icon">
+      @switch (eventType$ | async) {
+        @case ('ORDER_CREATED') {
+          <mat-icon>add_shopping_cart</mat-icon>
+        }
+        @case ('ORDER_UPDATED') {
+          <mat-icon>update</mat-icon>
+        }
+        @case ('ORDER_CANCELLED') {
+          <mat-icon>cancel</mat-icon>
+        }
+        @case ('ORDER_SHIPPED') {
+          <mat-icon>local_shipping</mat-icon>
+        }
+        @case ('ORDER_DELIVERED') {
+          <mat-icon>check_circle</mat-icon>
+        }
+        @default {
+          <mat-icon>receipt</mat-icon>
+        }
+      }
+    </div>
+    <div class="event-card__title">
+      <span class="event-card__order-id">Orden #{{ orderEvent.orderId }}</span>
+      <span class="event-card__type">{{ eventType$ | async }}</span>
+    </div>
+    <div class="event-card__timestamp">
+      {{ formatTimestamp(orderEvent.timestamp) }}
+    </div>
+  </div>
+
+  <div class="event-card__body">
+    <div class="event-card__info-row">
+      <span class="event-card__label">Cliente:</span>
+      <span class="event-card__value">{{ orderEvent.customerName }}</span>
+    </div>
+    <div class="event-card__info-row">
+      <span class="event-card__label">Email:</span>
+      <span class="event-card__value">{{ orderEvent.customerEmail }}</span>
+    </div>
+    <div class="event-card__info-row">
+      <span class="event-card__label">Estado:</span>
+      <span class="event-card__status" [class]="'event-card__status--' + orderEvent.status.toLowerCase()">
+        {{ orderEvent.status }}
+      </span>
+    </div>
+    <div class="event-card__info-row">
+      <span class="event-card__label">Total:</span>
+      <span class="event-card__value event-card__value--price">
+        {{ orderEvent.totalAmount | currency:orderEvent.currency }}
+      </span>
+    </div>
+  </div>
+
+  @if (orderEvent.items && orderEvent.items.length > 0) {
+    <div class="event-card__items">
+      <span class="event-card__label">Artículos ({{ orderEvent.items.length }}):</span>
+      <ul class="event-card__items-list">
+        @for (item of orderEvent.items; track item.productId) {
+          <li class="event-card__item">
+            <span class="event-card__item-name">{{ item.productName }}</span>
+            <span class="event-card__item-qty">x{{ item.quantity }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="event-card__footer">
+    <span class="event-card__source">
+      <mat-icon class="event-card__source-icon">cloud</mat-icon>
+      {{ orderEvent.source }}
+    </span>
+  </div>
+</div>
